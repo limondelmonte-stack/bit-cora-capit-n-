@@ -1,0 +1,6 @@
+{
+  "appId": "com.capitan.bitacora",
+  "appName": "Bitacora del Capitan",
+  "webDir": "www",
+  "bundledWebRuntime": false
+}
