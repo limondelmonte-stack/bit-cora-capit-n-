@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bitácora del Capitán</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style>
+        body { background-color: #0b0f19; color: #f3f4f6; font-family: monospace; }
+    </style>
+</head>
+<body class="p-4 max-w-md mx-auto">
+    <header class="border-b border-slate-800 pb-4 mb-4 flex justify-between items-center">
+        <h1 class="text-xl font-bold tracking-wider text-amber-500">⚓ BITÁCORA DEL CAPITÁN</h1>
+        <span class="text-xs text-slate-500">v1.0.0</span>
+    </header>
+
+    <main class="space-y-4">
+        <!-- Formulario de Registro Diario -->
+        <section class="bg-slate-900 border border-slate-800 p-4 rounded-lg">
+            <h2 class="text-sm font-bold text-slate-400 mb-2 uppercase tracking-wide">Registro de Hoy</h2>
+            <form id="bitacoraForm" class="space-y-3">
+                <div>
+                    <label class="text-xs text-slate-400 block mb-1">Nivel de Energía / Carga (1-5):</label>
+                    <input type="number" id="carga" min="1" max="5" value="3" class="w-full bg-slate-950 border border-slate-800 p-2 rounded text-amber-400 font-bold">
+                </div>
+                <div>
+                    <label class="text-xs text-slate-400 block mb-1">Ganancia o Victoria del Día:</label>
+                    <input type="text" id="ganancia" placeholder="Ej: Resolver avería principal..." class="w-full bg-slate-950 border border-slate-800 p-2 rounded text-sm">
+                </div>
+                <div>
+                    <label class="text-xs text-slate-400 block mb-1">Caja Negra (Notas sin filtro):</label>
+                    <textarea id="notas" rows="3" placeholder="Estado mental, reflexiones..." class="w-full bg-slate-950 border border-slate-800 p-2 rounded text-sm"></textarea>
+                </div>
+                <button type="submit" class="w-full bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold py-2 px-4 rounded transition">
+                    REGISTRAR BITÁCORA
+                </button>
+            </form>
+        </section>
+
+        <!-- Historial Guardado -->
+        <section class="bg-slate-900 border border-slate-800 p-4 rounded-lg">
+            <h2 class="text-sm font-bold text-slate-400 mb-2 uppercase tracking-wide">Historial de Navegación</h2>
+            <div id="historial" class="space-y-2 text-xs text-slate-300 max-h-60 overflow-y-auto">
+                <!-- Se cargan dinámicamente -->
+            </div>
+        </section>
+    </main>
+
+    <script>
+        function cargarHistorial() {
+            const historialDiv = document.getElementById('historial');
+            const registros = JSON.parse(localStorage.getItem('bitacora_registros') || '[]');
+            
+            if (registros.length === 0) {
+                historialDiv.innerHTML = '<p class="text-slate-600 italic">Sin registros previos en la bitácora.</p>';
+                return;
+            }
+
+            historialDiv.innerHTML = registros.map(reg => `
+                <div class="border-b border-slate-800 pb-2 mb-2">
+                    <div class="text-amber-500 font-bold">${reg.fecha} - Carga: ${reg.carga}/5</div>
+                    <div class="text-slate-300"><strong>Logro:</strong> ${reg.ganancia}</div>
+                    <div class="text-slate-500 italic">"${reg.notas}"</div>
+                </div>
+            `).join('');
+        }
+
+        document.getElementById('bitacoraForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const nuevoRegistro = {
+                fecha: new Date().toLocaleDateString(),
+                carga: document.getElementById('carga').value,
+                ganancia: document.getElementById('ganancia').value,
+                notas: document.getElementById('notas').value
+            };
+
+            const registros = JSON.parse(localStorage.getItem('bitacora_registros') || '[]');
+            registros.unshift(nuevoRegistro);
+            localStorage.setItem('bitacora_registros', JSON.stringify(registros));
+
+            document.getElementById('bitacoraForm').reset();
+            cargarHistorial();
+        });
+
+        cargarHistorial();
+    </script>
+</body>
+</html>
